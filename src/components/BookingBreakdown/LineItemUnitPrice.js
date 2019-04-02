@@ -19,20 +19,16 @@ const LineItemUnitPrice = props => {
     item => item.code === unitType && !item.reversal
   );
 
-  if (!unitPurchase) {
-    throw new Error(`LineItemUnitPrice: lineItem (${unitType}) missing`);
-  }
+  const formattedUnitPrice = unitPurchase ? formatMoney(intl, unitPurchase.unitPrice) : null;
 
-  const formattedUnitPrice = formatMoney(intl, unitPurchase.unitPrice);
-
-  return (
+  return formattedUnitPrice ? (
     <div className={css.lineItem}>
       <span className={css.itemLabel}>
         <FormattedMessage id={translationKey} />
       </span>
       <span className={css.itemValue}>{formattedUnitPrice}</span>
     </div>
-  );
+  ) : null;
 };
 
 LineItemUnitPrice.propTypes = {

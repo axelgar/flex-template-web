@@ -323,7 +323,13 @@ propTypes.transaction = shape({
 
     lineItems: arrayOf(
       shape({
-        code: oneOf(LINE_ITEMS).isRequired,
+        code: (props, propName, componentName) => {
+          if (!/^line-item\/.+/.test(props[propName])) {
+            return new Error(
+              `Invalid line-item code ${props[propName]} passed to ${componentName}.`
+            );
+          }
+        },
         includeFor: arrayOf(oneOf(['customer', 'provider'])).isRequired,
         quantity: instanceOf(Decimal),
         unitPrice: propTypes.money.isRequired,
