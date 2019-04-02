@@ -22,6 +22,7 @@ import LineItemProviderCommissionMaybe from './LineItemProviderCommissionMaybe';
 import LineItemProviderCommissionRefundMaybe from './LineItemProviderCommissionRefundMaybe';
 import LineItemRefundMaybe from './LineItemRefundMaybe';
 import LineItemTotalPrice from './LineItemTotalPrice';
+import LineItemsQuantityBasedMaybe from './LineItemsQuantityBasedMaybe';
 import css from './BookingBreakdown.css';
 
 export const BookingBreakdownComponent = props => {
@@ -44,12 +45,15 @@ export const BookingBreakdownComponent = props => {
       <LineItemBookingPeriod transaction={transaction} booking={booking} unitType={unitType} />
       <LineItemUnitsMaybe transaction={transaction} unitType={unitType} />
 
+      <LineItemsQuantityBasedMaybe transaction={transaction} intl={intl} />
+
       <LineItemSubTotalMaybe
         transaction={transaction}
         unitType={unitType}
         userRole={userRole}
         intl={intl}
       />
+
       <LineItemRefundMaybe transaction={transaction} unitType={unitType} intl={intl} />
 
       <LineItemCustomerCommissionMaybe
