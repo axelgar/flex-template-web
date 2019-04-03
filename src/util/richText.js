@@ -136,3 +136,21 @@ export const richText = (text, options) => {
     return acc.concat(parts);
   }, []);
 };
+
+/**
+ * Humanizes a line item code. Strips the "line-item/" namespace
+ * definition from the beginnign, replaces dashes with spaces and
+ * capitalizes the first character.
+ *
+ * @param {string} code a line item code
+ *
+ * @return {string} returns the line item code humanized
+ */
+export const humanizeLineItemCode = code => {
+  if (!/^line-item\/.+/.test(code)) {
+    throw new Error(`Invalid line item code: ${code}`);
+  }
+  const lowercase = code.replace(/^line-item\//, '').replace(/-/g, ' ');
+
+  return lowercase.charAt(0).toUpperCase() + lowercase.slice(1);
+};

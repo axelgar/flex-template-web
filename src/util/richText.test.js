@@ -6,6 +6,7 @@ import {
   linkifyOrWrapLinkSplit,
   wrapLongWord,
   richText,
+  humanizeLineItemCode,
 } from './richText';
 
 describe('richText', () => {
@@ -285,5 +286,23 @@ describe('richText', () => {
         `<span>Chars one${slashWithZWSP}two${slashWithZWSP}three - count until <span class=\"longWord\">exhaustion…</span> and a random link: <span class=\"longWord\">http://www.example.com</span></span>`
       );
     });
+  });
+});
+
+describe('humanizeLineItemCode', () => {
+  it('should humanize a line item code', () => {
+    expect(humanizeLineItemCode('line-item/new-line-item')).toEqual('New line item');
+  });
+
+  it('should capitalize a one word code', () => {
+    expect(humanizeLineItemCode('line-item/booking')).toEqual('Booking');
+  });
+
+  it('should reject a code with missing namespace', () => {
+    expect(() => humanizeLineItemCode('new-line-item')).toThrowError(Error);
+  });
+
+  it('should reject a code with missing code value', () => {
+    expect(() => humanizeLineItemCode('line-item/')).toThrowError(Error);
   });
 });
