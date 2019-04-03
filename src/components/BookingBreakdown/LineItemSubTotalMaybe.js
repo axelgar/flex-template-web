@@ -1,7 +1,10 @@
 import React from 'react';
 import { string } from 'prop-types';
 import { FormattedMessage, intlShape } from 'react-intl';
+import Decimal from 'decimal.js';
 import { formatMoney } from '../../util/currency';
+import config from '../../config';
+import { types as sdkTypes } from '../../util/sdkLoader';
 import {
   propTypes,
   LINE_ITEM_CUSTOMER_COMMISSION,
@@ -9,6 +12,38 @@ import {
 } from '../../util/types';
 
 import css from './BookingBreakdown.css';
+
+const { Money } = sdkTypes;
+
+/**
+ * Calculates the total price in sub units for multiple line items.
+ */
+const lineItemsTotal = lineItems => {
+  const amount = lineItems.reduce((total, item) => {
+    return total.plus(item.lineTotal.amount);
+  }, new Decimal(0));
+  return new Money(amount, config.currency);
+};
+
+/**
+ * Returns line items with a quantity attribute.
+ */
+const quantityBasedLineItems = transaction => {
+  return transaction.attributes.lineItems.filter(item => !!item.quantity && !item.reversal);
+};
+
+/**
+ * Checks if a transaction has line-items with a percentage attribute
+ * which are other than the commission line-items.
+ */
+const txHasPercentageBasedLineItems = transaction => {
+  return !!transaction.attributes.lineItems.find(item => {
+    return (
+      item.percentage &&
+      (item.code !== LINE_ITEM_CUSTOMER_COMMISSION || item.code !== LINE_ITEM_PROVIDER_COMMISSION)
+    );
+  });
+};
 
 /**
  * Checks if a transaction has a commission line-item for
@@ -39,12 +74,15 @@ const LineItemSubTotalMaybe = props => {
   // Show unit purchase line total (unit price * quantity) as a subtotal.
   // PLEASE NOTE that this assumes that the transaction doesn't have other
   // line item types than the defined unit type (e.g. week, month, year).
-  const showSubTotal = txHasCommission(transaction, userRole) || refund;
-  const unitPurchase = transaction.attributes.lineItems.find(
-    item => item.code === unitType && !item.reversal
-  );
+  const showSubTotal =
+    txHasCommission(transaction, userRole) || txHasPercentageBasedLineItems(transaction) || refund;
 
-  const formattedSubTotal = unitPurchase ? formatMoney(intl, unitPurchase.lineTotal) : null;
+  // all line items with a quantity attribute
+  const quantityLineItems = quantityBasedLineItems(transaction);
+  // line totals of those lien items combined
+  const subTotal = lineItemsTotal(quantityLineItems);
+
+  const formattedSubTotal = quantityLineItems.length > 0 ? formatMoney(intl, subTotal) : null;
 
   return formattedSubTotal && showSubTotal ? (
     <div className={css.lineItem}>
