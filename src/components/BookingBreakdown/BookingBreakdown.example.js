@@ -80,8 +80,8 @@ export const CustomerOrder = {
     userRole: 'customer',
     unitType: LINE_ITEM_NIGHT,
     transaction: exampleTransaction({
-      payinTotal: new Money(9000, CURRENCY),
-      payoutTotal: new Money(9000, CURRENCY),
+      payinTotal: new Money(16200, CURRENCY),
+      payoutTotal: new Money(16200, CURRENCY),
       lineItems: [
         {
           code: 'line-item/night',
